@@ -7,20 +7,32 @@
     <title>{{ $title ?? config('app.name', 'ExpenseHub') }}</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800" rel="stylesheet">
+    <style>[x-cloak] { display: none !important; }</style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body class="min-h-screen bg-slate-100 font-sans text-slate-900 antialiased" x-data>
+<body class="min-h-screen bg-slate-100 font-sans text-slate-900 antialiased" x-data="{ sidebarOpen: false }" @keydown.escape.window="sidebarOpen = false">
     <div class="flex min-h-screen">
         {{-- Sidebar --}}
-        <aside class="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col bg-slate-900 lg:flex">
-            <div class="flex h-16 items-center gap-2 border-b border-slate-800 px-6">
-                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500">
-                    <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
+        <div x-cloak x-show="sidebarOpen" x-transition.opacity @click="sidebarOpen = false" class="fixed inset-0 z-30 bg-slate-900/50 backdrop-blur-sm lg:hidden"></div>
+
+        <aside
+            class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full flex-col bg-slate-900 shadow-2xl transition-transform duration-200 ease-out lg:translate-x-0 lg:shadow-none"
+            :class="{ 'translate-x-0': sidebarOpen }">
+            <div class="flex h-16 items-center justify-between gap-2 border-b border-slate-800 px-6">
+                <div class="flex items-center gap-2">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500">
+                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <a href="{{ route(auth()->user()->isSuperAdmin() ? 'super-admin.dashboard' : 'dashboard') }}" wire:navigate @click="sidebarOpen = false" class="text-lg font-bold text-white">ExpenseHub</a>
                 </div>
-                <a href="{{ route(auth()->user()->isSuperAdmin() ? 'super-admin.dashboard' : 'dashboard') }}" wire:navigate class="text-lg font-bold text-white">ExpenseHub</a>
+                <button type="button" @click="sidebarOpen = false" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white lg:hidden" aria-label="Close navigation menu">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
             </div>
 
             <nav class="flex-1 space-y-1 px-3 py-4">
@@ -65,7 +77,7 @@
                 @endphp
 
                 @foreach ($navItems as $item)
-                    <a href="{{ route($item['route']) }}" wire:navigate
+                    <a href="{{ route($item['route']) }}" wire:navigate @click="sidebarOpen = false"
                         @class([
                             'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
                             'bg-gradient-to-r from-emerald-500/20 to-teal-500/10 text-emerald-400' => request()->routeIs($item['route'].'*') || request()->routeIs($item['route']),
@@ -117,7 +129,14 @@
         {{-- Main --}}
         <div class="flex flex-1 flex-col lg:pl-64">
             <header class="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/80 px-4 backdrop-blur-lg lg:px-8">
-                <h1 class="text-lg font-bold text-slate-900">{{ $title ?? 'Dashboard' }}</h1>
+                <div class="flex items-center gap-3">
+                    <button type="button" @click="sidebarOpen = true" class="rounded-xl border border-slate-200 bg-white p-2 text-slate-600 shadow-sm transition hover:bg-slate-50 hover:text-slate-900 lg:hidden" aria-label="Open navigation menu">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                    <h1 class="text-lg font-bold text-slate-900">{{ $title ?? 'Dashboard' }}</h1>
+                </div>
                 <div class="flex items-center gap-3">
                     <livewire:notifications.bell />
                     @can('expense.create.own')
