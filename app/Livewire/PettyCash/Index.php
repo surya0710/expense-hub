@@ -6,6 +6,7 @@ use App\Livewire\Concerns\WithSaveFeedback;
 use App\Models\PettyCashWallet;
 use App\Services\PettyCash\PettyCashService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -48,7 +49,11 @@ class Index extends Component
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'site' => ['nullable', 'string', 'max:255'],
-            'custodian_id' => ['required', 'integer', 'exists:users,id'],
+            'custodian_id' => [
+                'required',
+                'integer',
+                Rule::exists('users', 'id')->where('company_id', Auth::user()->company_id),
+            ],
             'opening_balance' => ['required', 'numeric', 'min:0'],
         ]);
 

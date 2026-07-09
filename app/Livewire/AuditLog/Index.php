@@ -109,7 +109,10 @@ class Index extends Component
 
         return view('livewire.audit-log.index', [
             'activities' => $activities,
-            'teamMembers' => User::query()->orderBy('name')->get(['id', 'name', 'email']),
+            'teamMembers' => User::query()
+                ->where('company_id', $user->company_id)
+                ->orderBy('name')
+                ->get(['id', 'name', 'email']),
             'viewingActivity' => $viewingActivity,
             'viewingChanges' => $viewingActivity ? $auditLogService->formattedChanges($viewingActivity) : collect(),
             'auditLogService' => $auditLogService,

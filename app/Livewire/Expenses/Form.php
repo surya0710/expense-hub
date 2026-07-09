@@ -155,11 +155,21 @@ class Form extends Component
         $validated = $this->validate([
             'date' => ['required', 'date', 'before_or_equal:today'],
             'amount' => ['required', 'numeric', 'min:0.01'],
-            'category_id' => ['required', 'exists:categories,id'],
-            'cost_center_id' => ['nullable', 'exists:cost_centers,id'],
+            'category_id' => [
+                'required',
+                Rule::exists('categories', 'id')->where('company_id', Auth::user()->company_id),
+            ],
+            'cost_center_id' => [
+                'nullable',
+                Rule::exists('cost_centers', 'id')->where('company_id', Auth::user()->company_id),
+            ],
             'vendor_name' => ['nullable', 'string', 'max:255'],
             'payment_mode' => ['required', Rule::enum(PaymentMode::class)],
-            'wallet_id' => ['nullable', 'required_if:payment_mode,petty_cash', 'exists:petty_cash_wallets,id'],
+            'wallet_id' => [
+                'nullable',
+                'required_if:payment_mode,petty_cash',
+                Rule::exists('petty_cash_wallets', 'id')->where('company_id', Auth::user()->company_id),
+            ],
             'gst_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'description' => ['required', 'string', 'max:500'],
             'reimbursable' => ['boolean'],

@@ -27,6 +27,7 @@ use App\Livewire\Settings\CompanyProfile;
 use App\Livewire\Settings\SubscriptionIndex;
 use App\Livewire\Settings\TeamIndex;
 use App\Livewire\Reimbursements\Index as ReimbursementsIndex;
+use App\Livewire\SuperAdmin\Dashboard as SuperAdminDashboard;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -43,6 +44,8 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware(['auth', SetCompanyContext::class])->group(function () {
+    Route::get('/super-admin', SuperAdminDashboard::class)->name('super-admin.dashboard');
+
     Route::get('/onboarding', OnboardingIndex::class)->name('onboarding');
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
 

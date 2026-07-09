@@ -26,9 +26,9 @@ class TeamService
             ? $data['role']
             : UserRole::from($data['role']);
 
-        if ($role === UserRole::Owner) {
+        if (in_array($role, [UserRole::Owner, UserRole::SuperAdmin], true)) {
             throw ValidationException::withMessages([
-                'role' => 'There can only be one owner per organization. Use Admin or Manager instead.',
+                'role' => 'Choose an organization role such as Admin, Manager, Accountant, or Employee.',
             ]);
         }
 
@@ -69,9 +69,9 @@ class TeamService
             ]);
         }
 
-        if ($role === UserRole::Owner) {
+        if (in_array($role, [UserRole::Owner, UserRole::SuperAdmin], true)) {
             throw ValidationException::withMessages([
-                'role' => 'There can only be one owner per organization.',
+                'role' => 'Choose an organization role such as Admin, Manager, Accountant, or Employee.',
             ]);
         }
 

@@ -57,8 +57,8 @@ class TeamIndex extends Component
             'role' => ['required', Rule::enum(UserRole::class)],
         ]);
 
-        if ($validated['role'] === UserRole::Owner->value) {
-            $this->addError('role', 'There can only be one owner. Choose another role.');
+        if (in_array($validated['role'], [UserRole::Owner->value, UserRole::SuperAdmin->value], true)) {
+            $this->addError('role', 'Choose an organization role such as Admin, Manager, Accountant, or Employee.');
 
             return;
         }
@@ -122,7 +122,7 @@ class TeamIndex extends Component
             ->get();
 
         $assignableRoles = collect(UserRole::cases())
-            ->reject(fn (UserRole $r) => $r === UserRole::Owner)
+            ->reject(fn (UserRole $r) => in_array($r, [UserRole::Owner, UserRole::SuperAdmin], true))
             ->values();
 
         return view('livewire.settings.team-index', [

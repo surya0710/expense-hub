@@ -115,7 +115,10 @@ class Index extends Component
             'categories' => Category::query()->where('is_active', true)->orderBy('name')->get(),
             'costCenters' => CostCenter::query()->where('is_active', true)->orderBy('name')->get(),
             'employees' => $user->can('expense.view.all')
-                ? User::query()->orderBy('name')->get(['id', 'name', 'email'])
+                ? User::query()
+                    ->where('company_id', $user->company_id)
+                    ->orderBy('name')
+                    ->get(['id', 'name', 'email'])
                 : collect(),
             'statuses' => $reportService->filterableStatuses(),
             'canViewAllExpenses' => $user->can('expense.view.all'),

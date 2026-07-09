@@ -19,6 +19,10 @@ class ExpensePolicy
 
     public function view(User $user, Expense $expense): bool
     {
+        if ($expense->company_id !== $user->company_id) {
+            return false;
+        }
+
         if ($user->can('expense.view.all')) {
             return true;
         }
@@ -33,6 +37,10 @@ class ExpensePolicy
 
     public function update(User $user, Expense $expense): bool
     {
+        if ($expense->company_id !== $user->company_id) {
+            return false;
+        }
+
         if (! in_array($expense->status, [\App\Enums\ExpenseStatus::Draft, \App\Enums\ExpenseStatus::Rejected])) {
             return false;
         }
@@ -42,6 +50,10 @@ class ExpensePolicy
 
     public function approve(User $user, Expense $expense): bool
     {
+        if ($expense->company_id !== $user->company_id) {
+            return false;
+        }
+
         if ($expense->status !== \App\Enums\ExpenseStatus::PendingApproval) {
             return false;
         }

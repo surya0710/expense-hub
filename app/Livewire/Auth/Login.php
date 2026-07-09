@@ -41,9 +41,27 @@ class Login extends Component
 
         request()->session()->regenerate();
 
-        Auth::user()?->update(['last_login_at' => now()]);
+        $user = Auth::user();
 
-        if (Auth::user()?->isOwner() && Auth::user()->company?->needsOnboarding()) {
+        if (! $user?->isSuperAdmin() && $user?->company?->accessIsBlocked()) {
+            Auth::logout();
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+
+            throw ValidationException::withMessages([
+                'email' => 'This organization account is suspended. Please contact support.',
+            ]);
+        }
+
+        $user?->update(['last_login_at' => now()]);
+
+        if ($user?->isSuperAdmin()) {
+            $this->redirect(route('super-admin.dashboard'), navigate: true);
+
+            return;
+        }
+
+        if ($user?->isOwner() && $user->company?->needsOnboarding()) {
             $this->redirect(route('onboarding'), navigate: true);
 
             return;

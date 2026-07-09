@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\User;
 use App\Services\Budget\BudgetService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -83,8 +84,18 @@ class BudgetIndex extends Component
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'scope' => ['required', 'in:category,user'],
-            'category_id' => ['required_if:scope,category', 'nullable', 'integer', 'exists:categories,id'],
-            'user_id' => ['required_if:scope,user', 'nullable', 'integer', 'exists:users,id'],
+            'category_id' => [
+                'required_if:scope,category',
+                'nullable',
+                'integer',
+                Rule::exists('categories', 'id')->where('company_id', Auth::user()->company_id),
+            ],
+            'user_id' => [
+                'required_if:scope,user',
+                'nullable',
+                'integer',
+                Rule::exists('users', 'id')->where('company_id', Auth::user()->company_id),
+            ],
             'amount' => ['required', 'numeric', 'min:1'],
             'period' => ['required', 'in:monthly,quarterly,yearly'],
             'alert_percent' => ['required', 'integer', 'min:50', 'max:100'],
@@ -155,7 +166,10 @@ class BudgetIndex extends Component
             'budgets' => $budgetService->budgetsForUser($user),
             'canManageBudgets' => $user->can('budget.manage'),
             'categories' => Category::query()->where('is_active', true)->orderBy('name')->get(),
-            'employees' => User::query()->orderBy('name')->get(['id', 'name', 'email']),
+            'employees' => User::query()
+                ->where('company_id', $user->company_id)
+                ->orderBy('name')
+                ->get(['id', 'name', 'email']),
             'scopes' => BudgetScope::cases(),
             'periods' => BudgetPeriod::cases(),
         ]);

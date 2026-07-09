@@ -20,7 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->redirectGuestsTo(fn () => route('login'));
-        $middleware->redirectUsersTo(fn () => route('dashboard'));
+        $middleware->redirectUsersTo(fn () => auth()->user()?->isSuperAdmin()
+            ? route('super-admin.dashboard')
+            : route('dashboard'));
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

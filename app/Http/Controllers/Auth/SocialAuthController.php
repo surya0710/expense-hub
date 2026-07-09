@@ -22,11 +22,17 @@ class SocialAuthController extends Controller
         $googleUser = Socialite::driver('google')->user();
 
         $user = User::query()
+            ->with('company')
             ->where('google_id', $googleUser->getId())
             ->orWhere('email', $googleUser->getEmail())
             ->first();
 
         if ($user) {
+            if (! $user->is_active) {
+                return redirect()->route('login')
+                    ->withErrors(['email' => 'This user account is inactive. Please contact your organization admin.']);
+            }
+
             if (! $user->google_id) {
                 $user->update([
                     'google_id' => $googleUser->getId(),
@@ -34,8 +40,17 @@ class SocialAuthController extends Controller
                 ]);
             }
 
+            if (! $user->isSuperAdmin() && $user->company?->accessIsBlocked()) {
+                return redirect()->route('login')
+                    ->withErrors(['email' => 'This organization account is suspended. Please contact support.']);
+            }
+
             Auth::login($user, remember: true);
             $user->update(['last_login_at' => now()]);
+
+            if ($user->isSuperAdmin()) {
+                return redirect()->route('super-admin.dashboard');
+            }
 
             return redirect()->intended(route('dashboard'));
         }
@@ -43,6 +58,11 @@ class SocialAuthController extends Controller
         $matchingCompany = $registrationService->companyForEmail($googleUser->getEmail());
 
         if ($matchingCompany) {
+            if ($matchingCompany->accessIsBlocked()) {
+                return redirect()->route('login')
+                    ->withErrors(['email' => 'This organization account is suspended. Please contact support.']);
+            }
+
             $user = $registrationService->joinCompanyFromOAuth($matchingCompany, [
                 'google_id' => $googleUser->getId(),
                 'name' => $googleUser->getName(),

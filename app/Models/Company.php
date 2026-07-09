@@ -83,6 +83,11 @@ class Company extends Model
             && $this->trial_ends_at?->isFuture();
     }
 
+    public function accessIsBlocked(): bool
+    {
+        return in_array($this->status, [CompanyStatus::Suspended, CompanyStatus::Cancelled], true);
+    }
+
     public function needsOnboarding(): bool
     {
         return ($this->settings['onboarding_completed'] ?? false) !== true;

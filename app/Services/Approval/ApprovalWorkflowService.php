@@ -212,7 +212,9 @@ class ApprovalWorkflowService
     public function assignedApproversForStep(ApprovalWorkflowStep $step, Company $company): Collection
     {
         if ($step->approver_type === ApproverType::User && $step->approver_user_id) {
-            $user = User::query()->find($step->approver_user_id);
+            $user = User::query()
+                ->where('company_id', $company->id)
+                ->find($step->approver_user_id);
 
             return $user ? collect([$user]) : collect();
         }

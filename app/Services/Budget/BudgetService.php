@@ -190,7 +190,10 @@ class BudgetService
                 ->get();
 
             if ($budget->scope === BudgetScope::User && $budget->user_id) {
-                $user = User::query()->find($budget->user_id);
+                $user = User::query()
+                    ->where('company_id', $expense->company_id)
+                    ->find($budget->user_id);
+
                 if ($user) {
                     $recipients = $recipients->push($user)->unique('id');
                 }

@@ -32,6 +32,8 @@ class RolePermissionSeeder extends Seeder
         'settings.manage',
         'users.invite',
         'subscription.manage',
+        'platform.view',
+        'platform.subscriptions.manage',
     ];
 
     public function run(): void
@@ -45,8 +47,18 @@ class RolePermissionSeeder extends Seeder
         $all = Permission::all();
 
         $rolePermissions = [
-            UserRole::Owner->value => $all->pluck('name')->all(),
-            UserRole::Admin->value => $all->whereNotIn('name', ['subscription.manage'])->pluck('name')->all(),
+            UserRole::SuperAdmin->value => [
+                'platform.view',
+                'platform.subscriptions.manage',
+            ],
+            UserRole::Owner->value => $all
+                ->whereNotIn('name', ['platform.view', 'platform.subscriptions.manage'])
+                ->pluck('name')
+                ->all(),
+            UserRole::Admin->value => $all
+                ->whereNotIn('name', ['subscription.manage', 'platform.view', 'platform.subscriptions.manage'])
+                ->pluck('name')
+                ->all(),
             UserRole::Manager->value => [
                 'expense.create.own', 'expense.view.own', 'expense.view.all',
                 'expense.approve', 'expense.reject', 'receipt.download',

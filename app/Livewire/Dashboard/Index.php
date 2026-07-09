@@ -22,6 +22,12 @@ class Index extends Component
     {
         $user = Auth::user();
 
+        if ($user->isSuperAdmin()) {
+            $this->redirect(route('super-admin.dashboard'), navigate: true);
+
+            return;
+        }
+
         if ($user->isOwner() && $user->company?->needsOnboarding()) {
             $this->redirect(route('onboarding'), navigate: true);
         }

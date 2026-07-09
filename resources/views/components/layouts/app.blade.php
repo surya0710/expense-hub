@@ -20,15 +20,19 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
-                <a href="{{ route('dashboard') }}" wire:navigate class="text-lg font-bold text-white">ExpenseHub</a>
+                <a href="{{ route(auth()->user()->isSuperAdmin() ? 'super-admin.dashboard' : 'dashboard') }}" wire:navigate class="text-lg font-bold text-white">ExpenseHub</a>
             </div>
 
             <nav class="flex-1 space-y-1 px-3 py-4">
                 @php
-                    $navItems = [
-                        ['route' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 12a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1v-7z'],
-                        ['route' => 'expenses.index', 'label' => 'Expenses', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'],
-                    ];
+                    $navItems = auth()->user()->isSuperAdmin()
+                        ? [
+                            ['route' => 'super-admin.dashboard', 'label' => 'Super Admin', 'icon' => 'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z'],
+                        ]
+                        : [
+                            ['route' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 12a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1v-7z'],
+                            ['route' => 'expenses.index', 'label' => 'Expenses', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'],
+                        ];
                     if (auth()->user()->can('wallet.view')) {
                         $navItems[] = ['route' => 'petty-cash.index', 'label' => 'Petty Cash', 'icon' => 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z'];
                     }
@@ -98,7 +102,7 @@
                     @endif
                     <div class="min-w-0 flex-1">
                         <p class="truncate text-sm font-medium text-white">{{ auth()->user()->name }}</p>
-                        <p class="truncate text-xs text-slate-500">{{ auth()->user()->company->name }}</p>
+                        <p class="truncate text-xs text-slate-500">{{ auth()->user()->isSuperAdmin() ? 'Platform' : auth()->user()->company->name }}</p>
                     </div>
                 </div>
                 <form method="POST" action="{{ route('logout') }}" class="mt-3">

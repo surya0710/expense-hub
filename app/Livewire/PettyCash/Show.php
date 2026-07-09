@@ -6,6 +6,7 @@ use App\Livewire\Concerns\WithSaveFeedback;
 use App\Models\PettyCashWallet;
 use App\Services\PettyCash\PettyCashService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -97,7 +98,11 @@ class Show extends Component
         $this->clearSaveFeedback();
 
         $validated = $this->validate([
-            'custodian_id' => ['required', 'integer', 'exists:users,id'],
+            'custodian_id' => [
+                'required',
+                'integer',
+                Rule::exists('users', 'id')->where('company_id', $this->wallet->company_id),
+            ],
             'balanceAmount' => ['required', 'numeric', 'min:0'],
             'balanceNote' => ['nullable', 'string', 'max:500'],
         ]);
