@@ -167,12 +167,22 @@
                 </div>
 
                 {{-- Enterprise callout --}}
+                @php
+                    $supportEmail = config('support.email');
+                    $supportPhone = config('support.phone');
+                    $supportPhoneHref = preg_replace('/\D+/', '', $supportPhone);
+                @endphp
                 <div class="mt-8 rounded-2xl border border-white/10 bg-white/5 px-6 py-5 text-center sm:flex sm:items-center sm:justify-between sm:text-left">
                     <div>
                         <p class="font-semibold text-white">Need Enterprise?</p>
                         <p class="mt-1 text-sm text-slate-400">100+ users, SSO, on-prem deployment, or custom integrations — talk to us.</p>
+                        <p class="mt-2 text-sm text-slate-300">
+                            Email <a href="mailto:{{ $supportEmail }}" class="font-semibold text-emerald-300 hover:underline">{{ $supportEmail }}</a>
+                            <span class="mx-1 text-slate-500">or</span>
+                            call <a href="tel:+{{ $supportPhoneHref }}" class="font-semibold text-emerald-300 hover:underline">{{ $supportPhone }}</a>
+                        </p>
                     </div>
-                    <a href="mailto:sales@expensehub.in" class="mt-4 inline-block rounded-xl border border-white/20 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 sm:mt-0">
+                    <a href="mailto:{{ $supportEmail }}" class="mt-4 inline-block rounded-xl border border-white/20 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 sm:mt-0">
                         Contact sales
                     </a>
                 </div>

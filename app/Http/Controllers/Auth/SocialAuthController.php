@@ -42,7 +42,7 @@ class SocialAuthController extends Controller
 
             if (! $user->isSuperAdmin() && $user->company?->accessIsBlocked()) {
                 return redirect()->route('login')
-                    ->withErrors(['email' => 'This organization account is suspended. Please contact support.']);
+                    ->withErrors(['email' => 'This organization account is suspended. Please contact support at '.config('support.email').' or '.config('support.phone').'.']);
             }
 
             Auth::login($user, remember: true);
@@ -60,7 +60,7 @@ class SocialAuthController extends Controller
         if ($matchingCompany) {
             if ($matchingCompany->accessIsBlocked()) {
                 return redirect()->route('login')
-                    ->withErrors(['email' => 'This organization account is suspended. Please contact support.']);
+                    ->withErrors(['email' => 'This organization account is suspended. Please contact support at '.config('support.email').' or '.config('support.phone').'.']);
             }
 
             $user = $registrationService->joinCompanyFromOAuth($matchingCompany, [

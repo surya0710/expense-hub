@@ -26,7 +26,7 @@ class SetCompanyContext
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
                 return redirect()->route('login')
-                    ->withErrors(['email' => 'This organization account is suspended. Please contact support.']);
+                    ->withErrors(['email' => 'This organization account is suspended. Please contact support at '.config('support.email').' or '.config('support.phone').'.']);
             }
 
             CompanyContext::setId($user->company_id);

@@ -49,7 +49,17 @@
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div class="border-b border-slate-100 px-6 py-4">
             <h3 class="font-semibold text-slate-900">Available plans</h3>
-            <p class="text-sm text-slate-500">Compare plans below. Online payment via Razorpay is coming soon — contact support to upgrade manually for now.</p>
+            @php
+                $supportEmail = config('support.email');
+                $supportPhone = config('support.phone');
+                $supportPhoneHref = preg_replace('/\D+/', '', $supportPhone);
+            @endphp
+            <p class="text-sm text-slate-500">
+                Compare plans below. Online payment via Razorpay is coming soon — contact support to upgrade manually:
+                <a href="mailto:{{ $supportEmail }}" class="font-semibold text-emerald-700 hover:underline">{{ $supportEmail }}</a>
+                <span class="text-slate-400">or</span>
+                <a href="tel:+{{ $supportPhoneHref }}" class="font-semibold text-emerald-700 hover:underline">{{ $supportPhone }}</a>.
+            </p>
         </div>
         <div class="grid gap-4 p-6 md:grid-cols-2 xl:grid-cols-4">
             @foreach($plans as $key => $item)

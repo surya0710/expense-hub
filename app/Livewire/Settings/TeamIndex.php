@@ -52,7 +52,7 @@ class TeamIndex extends Component
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'phone' => ['nullable', 'string', 'max:20'],
+            'phone' => ['nullable', 'string', 'max:20', 'unique:users,phone'],
             'password' => ['required', Password::min(8)->mixedCase()->numbers()->symbols()],
             'role' => ['required', Rule::enum(UserRole::class)],
         ]);

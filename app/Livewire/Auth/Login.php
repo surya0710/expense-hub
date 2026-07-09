@@ -49,7 +49,7 @@ class Login extends Component
             request()->session()->regenerateToken();
 
             throw ValidationException::withMessages([
-                'email' => 'This organization account is suspended. Please contact support.',
+                'email' => 'This organization account is suspended. Please contact support at '.config('support.email').' or '.config('support.phone').'.',
             ]);
         }
 

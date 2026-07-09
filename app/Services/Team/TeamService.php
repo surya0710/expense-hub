@@ -39,7 +39,7 @@ class TeamService
                 'company_id' => $company->id,
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'phone' => $data['phone'] ?? null,
+                'phone' => $data['phone'] ?: null,
                 'password' => Hash::make($data['password']),
                 'email_verified_at' => now(),
                 'is_active' => true,
