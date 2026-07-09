@@ -6,7 +6,9 @@ use App\Enums\UserRole;
 use App\Livewire\Concerns\WithSaveFeedback;
 use App\Models\User;
 use App\Services\Team\TeamService;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Attributes\Layout;
@@ -61,7 +63,17 @@ class TeamIndex extends Component
             return;
         }
 
-        $teamService->addMember(Auth::user()->company, Auth::user(), $validated);
+        try {
+            $teamService->addMember(Auth::user()->company, Auth::user(), $validated);
+        } catch (ValidationException $e) {
+            $this->addError('email', Arr::first(Arr::flatten($e->errors())) ?? $e->getMessage());
+
+            return;
+        } catch (\InvalidArgumentException $e) {
+            $this->addError('email', $e->getMessage());
+
+            return;
+        }
 
         $this->showAddModal = false;
         $this->notifySaved('Team member added. They can sign in with the email and password you set.');
